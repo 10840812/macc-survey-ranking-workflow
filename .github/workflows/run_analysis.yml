@@ -1,0 +1,42 @@
+name: Run survey analysis
+
+on:
+  # Run automatically when code is pushed to main.
+  push:
+    branches:
+      - main
+  # Allow manual runs from the Actions tab.
+  workflow_dispatch:
+
+jobs:
+  run-analysis:
+    name: Generate ranking outputs
+    runs-on: ubuntu-latest
+
+    steps:
+      # Get repository contents.
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      # Use Python 3.11 for consistency with this project.
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Install project dependencies.
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # Execute analysis to produce CSV and PNG outputs.
+      - name: Run analysis script
+        run: python src/analysis.py
+
+      # Upload generated files so they can be downloaded from the workflow run.
+      - name: Upload analysis artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: rank-order-outputs
+          path: |
+            outputs/rank_order.csv
+            outputs/rank_order.png
